@@ -19,7 +19,7 @@ For now, the Rust toolchain is needed in order to compile and run.
 
 Clone the repo, then run `cargo run` to compile and run.
 
-Installers and/or packages are planned for multiple platforms.
+Pre-compiled binaries are available in the releases.
 
 ## Usage
 
