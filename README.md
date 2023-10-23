@@ -15,11 +15,12 @@ Both need to be in the $PATH environment variable.
 
 ## Installation
 
-For now, the Rust toolchain is needed in order to compile and run.
+Pre-compiled binaries are available in the releases.
+
+Can also be compiled with `cargo`:
 
 Clone the repo, then run `cargo run` to compile and run.
 
-Pre-compiled binaries are available in the releases.
 
 ## Usage
 
