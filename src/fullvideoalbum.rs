@@ -4,6 +4,8 @@ use std::process::Command;
 use crate::{UrlInfo, Single, Chapter, Renderable, Downloadable};
 use crate::utils;
 
+extern crate sanitize_filename;
+
 #[derive(Default)]
 pub struct FullVideoAlbum {
     pub webpage_url: String,
@@ -209,14 +211,14 @@ impl Renderable for FullVideoAlbum {
 
 impl Downloadable for FullVideoAlbum {
     fn download(&self, base_dir: &PathBuf) {
-        let download_dir = base_dir.join("albums").join(&self.album_title);
-        let output_format = format!("{}---FULL.%(ext)s", &self.album_title);
+        let download_dir = base_dir.join("albums").join(sanitize_filename::sanitize(&self.album_title));
+        let output_format = format!("{}---FULL.%(ext)s", sanitize_filename::sanitize(&self.album_title));
         utils::download_video(&self.webpage_url, &output_format, download_dir.to_str().unwrap(), self.use_thumbnail);
 
         let full_mp3_name = output_format.replace("%(ext)s", "mp3");
         let full_mp3_path = download_dir.join(full_mp3_name);
         for (i, song) in self.songs.iter().enumerate() {
-            let mp3_name = format!("{}---{}.mp3", &song.track, &song.artist);
+            let mp3_name = format!("{}---{}.mp3", sanitize_filename::sanitize(&song.track), sanitize_filename::sanitize(&song.artist));
             let song_mp3_path = download_dir.join(mp3_name);
 
             let chapter = self.chapters.get(i).unwrap();

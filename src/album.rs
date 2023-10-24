@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use crate::{UrlInfo, Single, Renderable, Downloadable};
 use crate::utils;
 
+extern crate sanitize_filename;
+
 #[derive(Default)]
 pub struct Album {
     pub album_title: String,
@@ -93,9 +95,9 @@ impl Renderable for Album {
 
 impl Downloadable for Album {
     fn download(&self, base_dir: &PathBuf) {
-        let download_dir = base_dir.join("albums").join(&self.album_title);
+        let download_dir = base_dir.join("albums").join(sanitize_filename::sanitize(&self.album_title));
         for (i, song) in self.songs.iter().enumerate() {
-            let output_format = format!("{}---{}.%(ext)s", &song.track, &song.artist);
+            let output_format = format!("{}---{}.%(ext)s", sanitize_filename::sanitize(&song.track), sanitize_filename::sanitize(&song.artist));
             utils::download_video(&song.webpage_url, &output_format, download_dir.to_str().unwrap(), song.use_thumbnail);
 
             let mp3_name = output_format.replace("%(ext)s", "mp3");

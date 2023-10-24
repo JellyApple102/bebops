@@ -6,6 +6,8 @@ use std::io::Write;
 use crate::{UrlInfo, Single, Chapter, Renderable, Downloadable};
 use crate::utils;
 
+extern crate sanitize_filename;
+
 #[derive(Default)]
 pub struct FullVideoPlaylist {
     pub webpage_url: String,
@@ -194,8 +196,8 @@ impl Renderable for FullVideoPlaylist {
 
 impl Downloadable for FullVideoPlaylist {
     fn download(&self, base_dir: &PathBuf) {
-        let download_dir = base_dir.join("playlists").join(&self.playlist_title);
-        let output_format = format!("{}---FULL.%(ext)s", &self.playlist_title);
+        let download_dir = base_dir.join("playlists").join(sanitize_filename::sanitize(&self.playlist_title));
+        let output_format = format!("{}---FULL.%(ext)s", sanitize_filename::sanitize(&self.playlist_title));
         utils::download_video(&self.webpage_url, &output_format, download_dir.to_str().unwrap(), self.use_thumbnail);
 
         let mut file_string = String::default();
@@ -203,7 +205,7 @@ impl Downloadable for FullVideoPlaylist {
         let full_mp3_name = output_format.replace("%(ext)s", "mp3");
         let full_mp3_path = download_dir.join(full_mp3_name);
         for (i, song) in self.songs.iter().enumerate() {
-            let mp3_name = format!("{}---{}.mp3", &song.track, &song.artist);
+            let mp3_name = format!("{}---{}.mp3", sanitize_filename::sanitize(&song.track), sanitize_filename::sanitize(&song.artist));
             let song_mp3_path = download_dir.join(mp3_name);
 
             file_string.push_str(song_mp3_path.to_str().unwrap());
@@ -234,7 +236,7 @@ impl Downloadable for FullVideoPlaylist {
             }
         }
 
-        let file_path = download_dir.join(format!("{}.m3u8", &self.playlist_title));
+        let file_path = download_dir.join(format!("{}.m3u8", sanitize_filename::sanitize(&self.playlist_title)));
         let mut file = File::create(file_path).unwrap();
         let _ = file.write_all(file_string.as_bytes());
         utils::cleanup(&download_dir);

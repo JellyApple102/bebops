@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use eframe::egui;
 use serde::Deserialize;
 use core::f32;
@@ -162,7 +164,6 @@ impl MyApp {
             });
 
             ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                // TODO: fix url
                 ui.hyperlink_to("GitHub", "https://github.com/JellyApple102/BeBops");
             });
         });
@@ -184,9 +185,11 @@ impl eframe::App for MyApp {
 }
 
 fn main() -> Result<(), eframe::Error> {
+    const VERSION: &str = env!("CARGO_PKG_VERSION");
+
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
-        "bebops",
+        format!("bebops v{}", VERSION).as_str(),
         native_options,
         Box::new(|cc| Box::new(MyApp::new(cc)))
     )

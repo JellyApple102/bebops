@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use crate::{UrlInfo, Renderable, Downloadable};
 use crate::utils;
 
+extern crate sanitize_filename;
+
 #[derive(Default)]
 pub struct Single {
     pub webpage_url: String,
@@ -83,7 +85,7 @@ impl Renderable for Single {
 impl Downloadable for Single {
     fn download(&self, base_dir: &PathBuf) {
         let download_dir = base_dir.join("singles");
-        let output_format = format!("{}---{}.%(ext)s", &self.track, &self.artist);
+        let output_format = format!("{}---{}.%(ext)s", sanitize_filename::sanitize(&self.track), sanitize_filename::sanitize(&self.artist));
         utils::download_video(&self.webpage_url, &output_format, download_dir.to_str().unwrap(), self.use_thumbnail);
 
         let mp3_name = output_format.replace("%(ext)s", "mp3");

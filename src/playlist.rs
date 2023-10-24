@@ -5,6 +5,8 @@ use std::fs::File;
 use crate::{UrlInfo, Single, Renderable, Downloadable};
 use crate::utils;
 
+extern crate sanitize_filename;
+
 #[derive(Default)]
 pub struct Playlist {
     pub playlist_title: String,
@@ -76,11 +78,11 @@ impl Renderable for Playlist {
 
 impl Downloadable for Playlist {
     fn download(&self, base_dir: &PathBuf) {
-        let download_dir = base_dir.join("playlists").join(&self.playlist_title);
+        let download_dir = base_dir.join("playlists").join(sanitize_filename::sanitize(&self.playlist_title));
         let mut file_string = String::default();
 
         for song in &self.songs {
-            let output_format = format!("{}---{}.%(ext)s", &song.track, &song.artist);
+            let output_format = format!("{}---{}.%(ext)s", sanitize_filename::sanitize(&song.track), sanitize_filename::sanitize(&song.artist));
             utils::download_video(&song.webpage_url, &output_format, download_dir.to_str().unwrap(), song.use_thumbnail);
 
             let mp3_name = output_format.replace("%(ext)s", "mp3");
@@ -104,7 +106,7 @@ impl Downloadable for Playlist {
             }
         }
 
-        let file_path = download_dir.join(format!("{}.m3u8", &self.playlist_title));
+        let file_path = download_dir.join(format!("{}.m3u8", sanitize_filename::sanitize(&self.playlist_title)));
         let mut file = File::create(file_path).unwrap();
         let _ = file.write_all(file_string.as_bytes());
         utils::cleanup(&download_dir);
